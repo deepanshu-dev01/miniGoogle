@@ -10,16 +10,16 @@
       --google-red: #ea4335;
       --google-yellow: #fbbc04;
       --google-green: #34a853;
-      --bg-color: #f8fafd;
+      --bg-color: #f7f9fd;
       --card-bg: #ffffff;
       --text-main: #202124;
       --text-sub: #5f6368;
       --text-link: #1a0dab;
       --text-green-url: #202124;
       --border-color: #dfe1e5;
-      --shadow-sm: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.15);
-      --shadow-md: 0 4px 16px rgba(32,33,36,0.12);
-      --shadow-lg: 0 8px 24px rgba(32,33,36,0.14);
+      --shadow-sm: 0 2px 6px rgba(60,64,67,0.08);
+      --shadow-md: 0 6px 20px rgba(32,33,36,0.12);
+      --shadow-lg: 0 12px 36px rgba(32,33,36,0.16);
       --old-badge-bg: #feeceb;
       --old-badge-color: #c5221f;
       --new-badge-bg: #e6f4ea;
@@ -39,26 +39,123 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
       background-image: 
-        radial-gradient(#e8f0fe 1.5px, transparent 1.5px), 
-        radial-gradient(#f1f3f4 1.5px, var(--bg-color) 1.5px);
-      background-size: 40px 40px;
-      background-position: 0 0, 20px 20px;
+        radial-gradient(#d2e3fc 1.5px, transparent 1.5px), 
+        radial-gradient(#e8eaed 1.5px, var(--bg-color) 1.5px);
+      background-size: 36px 36px;
+      background-position: 0 0, 18px 18px;
+    }
+
+    /* =========================================================
+       DECORATIVE FLOATING CARTOON STICKERS
+       ========================================================= */
+    .sticker-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    .sticker {
+      position: absolute;
+      pointer-events: auto;
+      cursor: pointer;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none;
+    }
+
+    .sticker:hover {
+      transform: scale(1.18) rotate(6deg) !important;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.22));
+    }
+
+    /* 1. Kawaii Pizza Slice */
+    .sticker-pizza {
+      top: 140px;
+      left: 3%;
+      width: 100px;
+      height: 100px;
+      animation: floatSlow 4.5s ease-in-out infinite alternate;
+    }
+
+    /* 2. Kawaii Googlebot Crawler */
+    .sticker-robot {
+      top: 120px;
+      right: 4%;
+      width: 105px;
+      height: 105px;
+      animation: floatSlow 5s ease-in-out infinite alternate-reverse;
+    }
+
+    /* 3. Spam Bug Sticker */
+    .sticker-spambug {
+      top: 480px;
+      left: 2%;
+      width: 80px;
+      height: 80px;
+      animation: wiggleFloat 6s ease-in-out infinite;
+    }
+
+    /* 4. PageRank Gold Trophy */
+    .sticker-trophy {
+      top: 500px;
+      right: 3%;
+      width: 85px;
+      height: 85px;
+      animation: floatSlow 4s ease-in-out infinite alternate;
+    }
+
+    /* 5. Doodle Star Accents */
+    .sticker-star1 {
+      top: 80px;
+      left: 22%;
+      width: 32px;
+      height: 32px;
+      animation: pulseStar 3s ease-in-out infinite;
+    }
+    .sticker-star2 {
+      top: 90px;
+      right: 24%;
+      width: 28px;
+      height: 28px;
+      animation: pulseStar 3.5s ease-in-out infinite 1s;
+    }
+
+    @keyframes floatSlow {
+      0% { transform: translateY(0px) rotate(-3deg); }
+      100% { transform: translateY(-16px) rotate(4deg); }
+    }
+
+    @keyframes wiggleFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(-6deg); }
+    }
+
+    @keyframes pulseStar {
+      0%, 100% { transform: scale(0.9) rotate(0deg); opacity: 0.7; }
+      50% { transform: scale(1.15) rotate(15deg); opacity: 1; }
     }
 
     /* TOP NAVBAR */
     .top-nav {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border-color);
-      padding: 10px 28px;
+      padding: 10px 30px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 1px 6px rgba(32,33,36,0.05);
+      box-shadow: 0 1px 6px rgba(32,33,36,0.06);
       flex-wrap: wrap;
       gap: 12px;
     }
@@ -69,8 +166,8 @@
       gap: 12px;
     }
 
-    .logo {
-      font-size: 26px;
+    .logo-small {
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.5px;
       cursor: pointer;
@@ -78,16 +175,16 @@
       display: flex;
       align-items: center;
     }
-    .logo span.m { color: var(--google-blue); }
-    .logo span.i1 { color: var(--google-red); }
-    .logo span.n { color: var(--google-yellow); }
-    .logo span.i2 { color: var(--google-blue); }
-    .logo span.g { color: var(--google-green); }
-    .logo span.o1 { color: var(--google-red); }
-    .logo span.o2 { color: var(--google-yellow); }
-    .logo span.g2 { color: var(--google-blue); }
-    .logo span.l { color: var(--google-green); }
-    .logo span.e { color: var(--google-red); }
+    .logo-small span.m { color: var(--google-blue); }
+    .logo-small span.i1 { color: var(--google-red); }
+    .logo-small span.n { color: var(--google-yellow); }
+    .logo-small span.i2 { color: var(--google-blue); }
+    .logo-small span.g { color: var(--google-green); }
+    .logo-small span.o1 { color: var(--google-red); }
+    .logo-small span.o2 { color: var(--google-yellow); }
+    .logo-small span.g2 { color: var(--google-blue); }
+    .logo-small span.l { color: var(--google-green); }
+    .logo-small span.e { color: var(--google-red); }
 
     .tag-badge {
       background: linear-gradient(135deg, #e8f0fe, #d2e3fc);
@@ -142,8 +239,8 @@
       background: linear-gradient(135deg, #1a73e8, #174ea6);
       color: #ffffff;
       border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
+      padding: 8px 18px;
+      border-radius: 22px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
@@ -151,13 +248,13 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      box-shadow: 0 2px 6px rgba(26,115,232,0.3);
+      box-shadow: 0 3px 8px rgba(26,115,232,0.3);
     }
 
     .btn-primary:hover {
       background: linear-gradient(135deg, #174ea6, #1557b0);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(26,115,232,0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(26,115,232,0.4);
     }
 
     .btn-reset {
@@ -174,11 +271,8 @@
       gap: 6px;
       transition: all 0.15s;
     }
-    .btn-reset:hover {
-      background: #fce8e6;
-    }
+    .btn-reset:hover { background: #fce8e6; }
 
-    /* GOOGLE TOP RIGHT USER PROFILE */
     .user-profile-menu {
       display: flex;
       align-items: center;
@@ -196,9 +290,7 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    .app-waffle:hover {
-      background: #f1f3f4;
-    }
+    .app-waffle:hover { background: #f1f3f4; }
 
     .circle-avatar {
       width: 36px;
@@ -206,88 +298,131 @@
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid #ffffff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
     }
     .circle-avatar:hover {
-      transform: scale(1.08);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      transform: scale(1.1);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
     }
 
-    /* DECORATIVE SEARCH HERO */
-    .search-hero {
-      background: #ffffff;
-      padding: 32px 20px 26px;
-      border-bottom: 1px solid var(--border-color);
+    /* =========================================================
+       GRAND DECORATIVE HERO SECTION (CENTERED GOOGLE STAGE)
+       ========================================================= */
+    .hero-stage {
+      padding: 55px 20px 40px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      text-align: center;
       position: relative;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(248,250,253,0.95) 100%);
+      border-bottom: 1px solid #e1e6ef;
+      box-shadow: 0 4px 20px rgba(32,33,36,0.04);
     }
 
-    .search-hero-decor {
-      position: absolute;
-      top: 10px;
-      left: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--google-blue);
+    /* BIG GOOGLE DOODLE LOGO */
+    .hero-doodle-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 10px;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .hero-doodle-logo:hover {
+      transform: scale(1.04) rotate(-1deg);
+    }
+
+    .hero-doodle-logo span.m { color: var(--google-blue); }
+    .hero-doodle-logo span.i1 { color: var(--google-red); }
+    .hero-doodle-logo span.n { color: var(--google-yellow); }
+    .hero-doodle-logo span.i2 { color: var(--google-blue); }
+    .hero-doodle-logo span.g { color: var(--google-green); }
+    .hero-doodle-logo span.o1 { color: var(--google-red); }
+    .hero-doodle-logo span.o2 { color: var(--google-yellow); }
+    .hero-doodle-logo span.g2 { color: var(--google-blue); }
+    .hero-doodle-logo span.l { color: var(--google-green); }
+    .hero-doodle-logo span.e { color: var(--google-red); }
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: var(--text-sub);
+      font-weight: 500;
+      margin-bottom: 24px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .search-container {
+    .hero-doodle-pill {
+      background: linear-gradient(135deg, #fef7e0, #fff0c2);
+      border: 1px solid #fdd663;
+      color: #b06000;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(251,188,4,0.25);
+    }
+
+    /* GRAND CENTER SEARCH CONTAINER */
+    .hero-search-wrapper {
       width: 100%;
-      max-width: 740px;
+      max-width: 680px;
       position: relative;
+      margin-bottom: 22px;
     }
 
     .search-box {
       width: 100%;
-      height: 52px;
-      border: 1px solid #dfe1e5;
-      border-radius: 26px;
-      padding: 0 110px 0 48px;
-      font-size: 16px;
+      height: 56px;
+      border: 2px solid #dfe1e5;
+      border-radius: 28px;
+      padding: 0 115px 0 54px;
+      font-size: 17px;
       outline: none;
       transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
       background: #ffffff;
       color: var(--text-main);
-      box-shadow: 0 1px 6px rgba(32,33,36,0.08);
+      box-shadow: 0 3px 12px rgba(32,33,36,0.1);
     }
 
     .search-box:hover {
-      box-shadow: 0 2px 12px rgba(32,33,36,0.18);
-      border-color: #d2e3fc;
+      box-shadow: 0 4px 18px rgba(32,33,36,0.18);
+      border-color: #aecbfa;
     }
 
     .search-box:focus {
-      box-shadow: 0 3px 14px rgba(26,115,232,0.25);
+      box-shadow: 0 4px 20px rgba(26,115,232,0.25);
       border-color: var(--google-blue);
     }
 
     .search-icon-left {
       position: absolute;
-      left: 16px;
+      left: 20px;
       top: 50%;
       transform: translateY(-50%);
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       color: #9aa0a6;
       pointer-events: none;
     }
 
     .search-decor-tools {
       position: absolute;
-      right: 14px;
+      right: 18px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .decor-tool-btn {
@@ -299,57 +434,76 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #5f6368;
       transition: transform 0.15s;
     }
-    .decor-tool-btn:hover {
-      transform: scale(1.15);
-    }
+    .decor-tool-btn:hover { transform: scale(1.2); }
 
     .clear-btn {
       background: none;
       border: none;
       color: #70757a;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 19px;
       padding: 2px 4px;
       display: none;
     }
     .clear-btn:hover { color: var(--text-main); }
 
-    .quick-queries {
-      margin-top: 18px;
+    /* CUTE HAND-DRAWN DOODLE CALLOUT ARROW */
+    .doodle-arrow-hint {
+      position: absolute;
+      top: -30px;
+      right: -80px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #d93025;
+      transform: rotate(8deg);
+      pointer-events: none;
+    }
+    @media (max-width: 860px) {
+      .doodle-arrow-hint { display: none; }
+    }
+
+    /* QUICK QUERY CHIPS */
+    .quick-queries {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       flex-wrap: wrap;
       justify-content: center;
+      max-width: 800px;
     }
 
     .quick-label {
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--text-sub);
     }
 
     .chip {
-      background: #f1f3f4;
-      border: 1px solid #e0e0e0;
-      padding: 6px 14px;
-      border-radius: 18px;
+      background: #ffffff;
+      border: 1px solid #dadce0;
+      padding: 7px 16px;
+      border-radius: 20px;
       font-size: 13px;
+      font-weight: 500;
       color: var(--text-main);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
 
     .chip:hover {
-      background: #e8eaed;
-      border-color: #dadce0;
-      transform: translateY(-1px);
+      background: #f1f3f4;
+      border-color: #bdc1c6;
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
 
     .chip.highlight {
@@ -357,29 +511,29 @@
       border-color: #fdd663;
       color: #b06000;
       font-weight: 700;
-      box-shadow: 0 1px 3px rgba(251,188,4,0.3);
+      box-shadow: 0 2px 6px rgba(251,188,4,0.3);
     }
 
-    /* MAIN CONTENT */
+    /* MAIN COMPARISON WORKSPACE */
     .main-content {
       max-width: 1400px;
       width: 100%;
       margin: 0 auto;
-      padding: 26px 20px;
+      padding: 28px 20px 40px;
       flex: 1;
     }
 
-    /* DECORATIVE INSIGHT CALLOUT */
+    /* INSIGHT BANNER */
     .insight-banner {
-      background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
-      border-radius: 14px;
-      padding: 20px 26px;
+      background: linear-gradient(135deg, #ffffff 0%, #f6faff 100%);
+      border-radius: 16px;
+      padding: 22px 28px;
       border: 1px solid #d2e3fc;
       box-shadow: var(--shadow-sm);
-      margin-bottom: 24px;
+      margin-bottom: 28px;
       display: flex;
       align-items: flex-start;
-      gap: 18px;
+      gap: 20px;
       position: relative;
       overflow: hidden;
     }
@@ -389,13 +543,13 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 6px;
+      width: 7px;
       height: 100%;
-      background: linear-gradient(to bottom, var(--google-blue), var(--google-green));
+      background: linear-gradient(to bottom, var(--google-blue), var(--google-green), var(--google-yellow));
     }
 
     .insight-icon {
-      font-size: 32px;
+      font-size: 34px;
       line-height: 1;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }
@@ -424,7 +578,7 @@
     .comparison-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 26px;
       align-items: start;
     }
 
@@ -436,13 +590,13 @@
 
     .engine-column {
       background: #ffffff;
-      border-radius: 14px;
+      border-radius: 16px;
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: box-shadow 0.2s;
+      transition: all 0.25s ease;
     }
 
     .engine-column:hover {
@@ -450,7 +604,7 @@
     }
 
     .col-header {
-      padding: 18px 22px;
+      padding: 20px 24px;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
@@ -460,12 +614,12 @@
 
     .col-header.old-way {
       background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
-      border-top: 4px solid var(--google-red);
+      border-top: 5px solid var(--google-red);
     }
 
     .col-header.new-way {
       background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
-      border-top: 4px solid var(--google-green);
+      border-top: 5px solid var(--google-green);
     }
 
     .col-title-area {
@@ -475,7 +629,7 @@
     }
 
     .col-title {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -515,10 +669,10 @@
 
     /* SEARCH RESULT CARDS WITH CIRCLE PROFILE PICTURES */
     .results-list {
-      padding: 18px 20px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
 
     .result-card {
@@ -532,7 +686,7 @@
 
     .result-card:hover {
       border-color: #aecbfa;
-      box-shadow: 0 4px 12px rgba(26,115,232,0.08);
+      box-shadow: 0 4px 14px rgba(26,115,232,0.1);
       transform: translateY(-2px);
     }
 
@@ -562,19 +716,19 @@
     }
 
     .card-profile-img {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       object-fit: cover;
-      border: 1.5px solid #ffffff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
       flex-shrink: 0;
     }
 
     .card-author-meta {
       display: flex;
       flex-direction: column;
-      line-height: 1.2;
+      line-height: 1.25;
     }
 
     .card-author-name {
@@ -713,9 +867,7 @@
       cursor: pointer;
       transition: all 0.15s;
     }
-    .btn-inspect:hover {
-      background: #e8f0fe;
-    }
+    .btn-inspect:hover { background: #e8f0fe; }
 
     .btn-delete-card {
       background: #ffffff;
@@ -732,11 +884,11 @@
     .tab-section {
       display: none;
       background: #ffffff;
-      border-radius: 14px;
+      border-radius: 16px;
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
-      padding: 26px;
-      margin-bottom: 24px;
+      padding: 28px;
+      margin-bottom: 28px;
     }
     .tab-section.active { display: block; }
 
@@ -762,10 +914,10 @@
       width: 100%;
       background: #fafafa;
       border: 1px solid var(--border-color);
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
       position: relative;
-      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
     }
 
     svg.network-canvas {
@@ -840,7 +992,7 @@
     .math-card {
       background: #f8fafd;
       border: 1px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 20px;
     }
 
@@ -894,7 +1046,7 @@
       width: 100%;
       max-width: 840px;
       max-height: 90vh;
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -954,14 +1106,13 @@
       line-height: 1.7;
     }
 
-    /* DECORATIVE AUTHOR PROFILE HEADER INSIDE WEBPAGE */
     .webpage-author-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 14px 18px;
       background: #f8fafd;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid #e2ecf9;
       margin-bottom: 20px;
       flex-wrap: wrap;
@@ -1067,7 +1218,7 @@
     footer {
       background: #ffffff;
       border-top: 1px solid var(--border-color);
-      padding: 18px 24px;
+      padding: 20px 24px;
       text-align: center;
       font-size: 13px;
       color: var(--text-sub);
@@ -1076,10 +1227,122 @@
 </head>
 <body>
 
-  <!-- TOP NAVIGATION -->
+  <!-- FLOATING CARTOON STICKERS IN BACKGROUND -->
+  <div class="sticker-container">
+    
+    <!-- 1. KAWAII PIZZA SLICE STICKER -->
+    <div class="sticker sticker-pizza" title="Kawaii Pizza Slice: 'Rank me with PageRank, not spam!'" onclick="stickerPop(this)">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <!-- Crust -->
+        <path d="M 15 22 Q 50 10 85 22 Q 50 95 15 22 Z" fill="#f59e0b" stroke="#b45309" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Melted Cheese -->
+        <path d="M 19 26 Q 50 16 81 26 Q 50 90 19 26 Z" fill="#fbbf24"/>
+        <path d="M 22 30 Q 30 38 38 28 Q 48 40 58 28 Q 68 38 78 30 Q 50 86 22 30 Z" fill="#fef08a"/>
+        <!-- Pepperonis -->
+        <circle cx="50" cy="42" r="8" fill="#dc2626" stroke="#991b1b" stroke-width="1.5"/>
+        <circle cx="38" cy="62" r="6" fill="#dc2626" stroke="#991b1b" stroke-width="1.5"/>
+        <circle cx="62" cy="60" r="7" fill="#dc2626" stroke="#991b1b" stroke-width="1.5"/>
+        <!-- Kawaii Eyes -->
+        <circle cx="43" cy="48" r="3" fill="#1e293b"/>
+        <circle cx="42" cy="46.5" r="1" fill="#ffffff"/>
+        <circle cx="57" cy="48" r="3" fill="#1e293b"/>
+        <circle cx="56" cy="46.5" r="1" fill="#ffffff"/>
+        <!-- Blushing Cheeks -->
+        <ellipse cx="37" cy="52" rx="3.5" ry="2" fill="#f43f5e" opacity="0.6"/>
+        <ellipse cx="63" cy="52" rx="3.5" ry="2" fill="#f43f5e" opacity="0.6"/>
+        <!-- Smile -->
+        <path d="M 47 52 Q 50 56 53 52" stroke="#1e293b" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- 2. KAWAII GOOGLEBOT CRAWLER STICKER -->
+    <div class="sticker sticker-robot" title="Googlebot Crawler: 'Scanning backlinks and indexing pages!'" onclick="stickerPop(this)">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <!-- Antenna -->
+        <line x1="50" y1="20" x2="50" y2="10" stroke="#64748b" stroke-width="3"/>
+        <circle cx="50" cy="8" r="5" fill="#34a853"/>
+        <circle cx="50" cy="8" r="2" fill="#86efac"/>
+        <!-- Head -->
+        <rect x="22" y="20" width="56" height="42" rx="12" fill="#3b82f6" stroke="#1d4ed8" stroke-width="3"/>
+        <!-- Screen Face -->
+        <rect x="28" y="26" width="44" height="30" rx="8" fill="#1e293b"/>
+        <!-- Glowing Cyan Eyes -->
+        <circle cx="40" cy="40" r="4.5" fill="#38bdf8"/>
+        <circle cx="38.5" cy="38.5" r="1.5" fill="#ffffff"/>
+        <circle cx="60" cy="40" r="4.5" fill="#38bdf8"/>
+        <circle cx="58.5" cy="38.5" r="1.5" fill="#ffffff"/>
+        <!-- Cute Smile -->
+        <path d="M 46 47 Q 50 51 54 47" stroke="#38bdf8" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- Ears -->
+        <rect x="16" y="32" width="6" height="18" rx="3" fill="#f59e0b"/>
+        <rect x="78" y="32" width="6" height="18" rx="3" fill="#f59e0b"/>
+        <!-- Crawling Legs -->
+        <path d="M 30 62 Q 22 76 18 82" stroke="#64748b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M 42 62 Q 40 76 38 84" stroke="#64748b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M 58 62 Q 60 76 62 84" stroke="#64748b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M 70 62 Q 78 76 82 82" stroke="#64748b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- 3. SPAM BUG CARTOON STICKER -->
+    <div class="sticker sticker-spambug" title="Keyword Spam Bug: 'Pizza pizza pizza!'" onclick="stickerPop(this)">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <!-- Body -->
+        <ellipse cx="50" cy="55" rx="26" ry="22" fill="#ef4444" stroke="#991b1b" stroke-width="3"/>
+        <!-- Antennae -->
+        <path d="M 40 38 Q 30 24 22 24" stroke="#991b1b" stroke-width="2.5" fill="none"/>
+        <circle cx="22" cy="24" r="3" fill="#ef4444"/>
+        <path d="M 60 38 Q 70 24 78 24" stroke="#991b1b" stroke-width="2.5" fill="none"/>
+        <circle cx="78" cy="24" r="3" fill="#ef4444"/>
+        <!-- Crossed Eyes (Spam defeated) -->
+        <line x1="38" y1="48" x2="46" y2="56" stroke="#ffffff" stroke-width="2.5"/>
+        <line x1="46" y1="48" x2="38" y2="56" stroke="#ffffff" stroke-width="2.5"/>
+        <line x1="54" y1="48" x2="62" y2="56" stroke="#ffffff" stroke-width="2.5"/>
+        <line x1="62" y1="48" x2="54" y2="56" stroke="#ffffff" stroke-width="2.5"/>
+        <!-- Legs -->
+        <path d="M 24 55 L 12 50 M 24 62 L 12 65 M 76 55 L 88 50 M 76 62 L 88 65" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Tag -->
+        <rect x="30" y="66" width="40" height="14" rx="4" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="50" y="77" font-size="8" font-weight="bold" fill="#b91c1c" text-anchor="middle">SPAM</text>
+      </svg>
+    </div>
+
+    <!-- 4. PAGERANK GOLD TROPHY STICKER -->
+    <div class="sticker sticker-trophy" title="PageRank Golden Trophy: '#1 Trusted Authority!'" onclick="stickerPop(this)">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <!-- Base -->
+        <rect x="34" y="76" width="32" height="10" rx="3" fill="#78350f"/>
+        <rect x="42" y="66" width="16" height="12" fill="#d97706"/>
+        <!-- Cup -->
+        <path d="M 28 24 L 72 24 C 72 50 62 66 50 66 C 38 66 28 50 28 24 Z" fill="#fbbf24" stroke="#d97706" stroke-width="2.5"/>
+        <!-- Inside Cup Highlight -->
+        <ellipse cx="50" cy="24" rx="22" ry="5" fill="#fef08a"/>
+        <!-- Handles -->
+        <path d="M 28 30 C 14 30 14 50 28 52" stroke="#d97706" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M 72 30 C 86 30 86 50 72 52" stroke="#d97706" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- Star Emblem -->
+        <path d="M 50 36 L 52.5 43 L 60 43.5 L 54.5 48 L 56.5 55 L 50 51 L 43.5 55 L 45.5 48 L 40 43.5 L 47.5 43 Z" fill="#ffffff"/>
+      </svg>
+    </div>
+
+    <!-- 5. SPARKLE STARS -->
+    <div class="sticker sticker-star1">
+      <svg viewBox="0 0 40 40" width="100%" height="100%">
+        <path d="M 20 0 Q 20 20 40 20 Q 20 20 20 40 Q 20 20 0 20 Q 20 20 20 0 Z" fill="#fbbc04"/>
+      </svg>
+    </div>
+    <div class="sticker sticker-star2">
+      <svg viewBox="0 0 40 40" width="100%" height="100%">
+        <path d="M 20 0 Q 20 20 40 20 Q 20 20 20 40 Q 20 20 0 20 Q 20 20 20 0 Z" fill="#4285f4"/>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- TOP NAVIGATION BAR -->
   <header class="top-nav">
     <div class="brand-group">
-      <a class="logo" onclick="setQuery('pizza')" title="miniGoogle Search">
+      <a class="logo-small" onclick="setQuery('pizza')" title="miniGoogle Search">
         <span class="m">m</span><span class="i1">i</span><span class="n">n</span><span class="i2">i</span>
         <span class="g">G</span><span class="o1">o</span><span class="o2">o</span><span class="g2">g</span><span class="l">l</span><span class="e">e</span>
       </a>
@@ -1121,13 +1384,24 @@
     </div>
   </header>
 
-  <!-- SEARCH HERO BAR -->
-  <section class="search-hero">
-    <div class="search-hero-decor">
-      <span>✨ Stanford PageRank vs 1990s Keyword Engine Demo</span>
+  <!-- =========================================================
+       GRAND DECORATIVE CENTERED GOOGLE HERO STAGE
+       ========================================================= -->
+  <section class="hero-stage">
+    
+    <!-- BIG PLAYFUL GOOGLE DOODLE LOGO -->
+    <div class="hero-doodle-logo" onclick="setQuery('pizza')" title="miniGoogle Doodle">
+      <span class="m">m</span><span class="i1">i</span><span class="n">n</span><span class="i2">i</span>
+      <span class="g">G</span><span class="o1">o</span><span class="o2">o</span><span class="g2">g</span><span class="l">l</span><span class="e">e</span>
     </div>
 
-    <div class="search-container">
+    <div class="hero-subtitle">
+      <span>Compare Pre-1998 Keyword Frequency vs Stanford PageRank</span>
+      <span class="hero-doodle-pill">✨ Interactive Simulation</span>
+    </div>
+
+    <!-- CENTER SEARCH CONTAINER WITH DOODLE ARROW -->
+    <div class="hero-search-wrapper">
       <svg class="search-icon-left" viewBox="0 0 24 24" fill="currentColor">
         <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
       </svg>
@@ -1144,7 +1418,7 @@
         <button class="clear-btn" id="clearBtn" onclick="clearSearch()" title="Clear">✕</button>
         <!-- Google Microphone Icon -->
         <button class="decor-tool-btn" title="Search by Voice">
-          <svg viewBox="0 0 24 24" width="20" height="20">
+          <svg viewBox="0 0 24 24" width="22" height="22">
             <path fill="#4285f4" d="m12 15c1.66 0 3-1.34 3-3v-6c0-1.66-1.34-3-3-3s-3 1.34-3 3v6c0 1.66 1.34 3 3 3z"/>
             <path fill="#34a853" d="m11 18.08h2v3.92h-2z"/>
             <path fill="#fbbc05" d="m7.05 16.95-1.41-1.41c1.64-1.64 2.66-3.9 2.66-6.54h2c0 3.19-1.23 6.13-3.25 7.95z"/>
@@ -1153,16 +1427,22 @@
         </button>
         <!-- Google Lens Camera Icon -->
         <button class="decor-tool-btn" title="Search by Image">
-          <svg viewBox="0 0 24 24" width="20" height="20">
+          <svg viewBox="0 0 24 24" width="22" height="22">
             <path fill="#4285f4" d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
             <path fill="#ea4335" d="M19 6.5h-1.8L15.8 4H8.2L6.8 6.5H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-10c0-1.1-.9-2-2-2Zm-7 13c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6Z"/>
           </svg>
         </button>
       </div>
+
+      <!-- Playful Callout Note -->
+      <div class="doodle-arrow-hint">
+        <span>Try "pizza"! 🍕 ⤷</span>
+      </div>
     </div>
 
+    <!-- QUICK QUERIES CHIPS -->
     <div class="quick-queries">
-      <span class="quick-label">Try searches:</span>
+      <span class="quick-label">Popular Searches:</span>
       <button class="chip highlight" onclick="setQuery('pizza')">🍕 "pizza" (Spam Benchmark)</button>
       <button class="chip" onclick="setQuery('pune')">📍 "pune"</button>
       <button class="chip" onclick="setQuery('recipes')">👨‍🍳 "recipes"</button>
@@ -2371,6 +2651,13 @@ PR(u) = (1 - d)/N  +  d × ∑ [ PR(v) / L(v) ]
         document.getElementById("viewMath").classList.add("active");
         renderMathTable();
       }
+    }
+
+    function stickerPop(el) {
+      el.style.transform = "scale(1.3) rotate(12deg)";
+      setTimeout(() => {
+        el.style.transform = "";
+      }, 300);
     }
 
     window.addEventListener("keydown", (e) => {
