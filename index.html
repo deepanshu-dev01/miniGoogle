@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>miniGoogle - PageRank vs Keyword Frequency Engine</title>
+  <style>
+    :root {
+      --google-blue: #1a73e8;
+      --google-red: #ea4335;
+      --google-yellow: #fbbc04;
+      --google-green: #34a853;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #202124;
+      --text-sub: #5f6368;
+      --text-link: #1a0dab;
+      --text-green-url: #202124;
+      --border-color: #dadce0;
+      --shadow-sm: 0 1px 3px rgba(60,64,67,0.12), 0 1px 2px rgba(60,64,67,0.24);
+      --shadow-md: 0 4px 12px rgba(60,64,67,0.15);
+      --old-badge-bg: #feeceb;
+      --old-badge-color: #c5221f;
+      --new-badge-bg: #e6f4ea;
+      --new-badge-color: #137333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP NAVBAR */
+    .top-nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+    .logo span.m { color: var(--google-blue); }
+    .logo span.i1 { color: var(--google-red); }
+    .logo span.n { color: var(--google-yellow); }
+    .logo span.i2 { color: var(--google-blue); }
+    .logo span.g { color: var(--google-green); }
+    .logo span.o1 { color: var(--google-red); }
+    .logo span.o2 { color: var(--google-yellow); }
+    .logo span.g2 { color: var(--google-blue); }
+    .logo span.l { color: var(--google-green); }
+    .logo span.e { color: var(--google-red); }
+
+    .tag-badge {
+      background: #e8f0fe;
+      color: var(--google-blue);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-outline:hover {
+      background: #f1f3f4;
+      color: var(--text-main);
+      border-color: #c6c9cc;
+    }
+
+    .btn-outline.active {
+      background: #e8f0fe;
+      border-color: #aecbfa;
+      color: var(--google-blue);
+    }
+
+    .btn-primary {
+      background: var(--google-blue);
+      color: #ffffff;
+      border: 1px solid var(--google-blue);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(26,115,232,0.3);
+    }
+
+    .btn-primary:hover {
+      background: #1557b0;
+      box-shadow: 0 2px 6px rgba(26,115,232,0.4);
+    }
+
+    .btn-reset {
+      background: #fce8e6;
+      color: #c5221f;
+      border: 1px solid #fad2cf;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+
+    .btn-reset:hover {
+      background: #fad2cf;
+    }
+
+    /* SEARCH HERO BAR */
+    .search-hero {
+      background: #ffffff;
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .search-container {
+      width: 100%;
+      max-width: 720px;
+      position: relative;
+    }
+
+    .search-box {
+      width: 100%;
+      height: 48px;
+      border: 1px solid #dfe1e5;
+      border-radius: 24px;
+      padding: 0 48px 0 46px;
+      font-size: 16px;
+      outline: none;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      background: #ffffff;
+      color: var(--text-main);
+    }
+
+    .search-box:hover {
+      box-shadow: 0 1px 6px rgba(32,33,36,0.28);
+      border-color: rgba(223,225,229,0);
+    }
+
+    .search-box:focus {
+      box-shadow: 0 1px 6px rgba(32,33,36,0.28);
+      border-color: transparent;
+    }
+
+    .search-icon-left {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: #9aa0a6;
+      pointer-events: none;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #70757a;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px 8px;
+      display: none;
+    }
+
+    .clear-btn:hover {
+      color: var(--text-main);
+    }
+
+    .quick-queries {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .quick-label {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .chip {
+      background: #f1f3f4;
+      border: 1px solid transparent;
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .chip:hover {
+      background: #e8eaed;
+      border-color: #dadce0;
+    }
+
+    .chip.highlight {
+      background: #fef7e0;
+      border-color: #fdd663;
+      color: #b06000;
+      font-weight: 600;
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px;
+      flex: 1;
+    }
+
+    /* INSIGHT BANNER */
+    .insight-banner {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 18px 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .insight-icon {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .insight-body {
+      flex: 1;
+    }
+
+    .insight-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+
+    .insight-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    .insight-desc strong {
+      color: var(--text-main);
+    }
+
+    /* COMPARISON GRID */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .engine-column {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .col-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .col-header.old-way {
+      background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+      border-top: 4px solid var(--google-red);
+    }
+
+    .col-header.new-way {
+      background: linear-gradient(135deg, #f0fdf4 0%, #fff 100%);
+      border-top: 4px solid var(--google-green);
+    }
+
+    .col-title-area {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .col-title {
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .col-subtitle {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .pill-badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .pill-badge.red {
+      background: var(--old-badge-bg);
+      color: var(--old-badge-color);
+    }
+
+    .pill-badge.green {
+      background: var(--new-badge-bg);
+      color: var(--new-badge-color);
+    }
+
+    .pill-badge.blue {
+      background: #e8f0fe;
+      color: #1a73e8;
+    }
+
+    /* RESULTS LIST */
+    .results-list {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .result-card {
+      border: 1px solid #edf0f2;
+      border-radius: 8px;
+      padding: 14px 16px;
+      transition: all 0.2s ease;
+      background: #ffffff;
+      position: relative;
+    }
+
+    .result-card:hover {
+      border-color: #c6cdd5;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .result-card.spam-winner {
+      border: 2px dashed var(--google-red);
+      background: #fffafa;
+    }
+
+    .result-card.legit-winner {
+      border: 2px solid var(--google-green);
+      background: #f6fcf8;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .rank-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .rank-pill.gold {
+      background: #fef7e0;
+      color: #b06000;
+      border: 1px solid #fdd663;
+    }
+    .rank-pill.silver {
+      background: #f1f3f4;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+    }
+    .rank-pill.standard {
+      background: #fafafa;
+      color: #70757a;
+      border: 1px solid #e0e0e0;
+    }
+
+    .rank-change {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .rank-change.up {
+      color: #137333;
+      background: #e6f4ea;
+    }
+    .rank-change.down {
+      color: #c5221f;
+      background: #fce8e6;
+    }
+    .rank-change.same {
+      color: #5f6368;
+      background: #f1f3f4;
+    }
+
+    .result-url-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-green-url);
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+
+    .favicon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #e8eaed;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: #5f6368;
+    }
+
+    .result-title {
+      font-size: 17px;
+      color: var(--text-link);
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      line-height: 1.3;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .result-title:hover {
+      text-decoration: underline;
+    }
+
+    .result-snippet {
+      font-size: 13px;
+      color: var(--text-sub);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .result-snippet mark {
+      background-color: #fff3c4;
+      color: #202124;
+      padding: 0 2px;
+      border-radius: 2px;
+      font-weight: 600;
+    }
+
+    .card-stats {
+      background: #f8f9fa;
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #3c4043;
+    }
+
+    .stat-badge strong {
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    .stat-bar-container {
+      flex: 1;
+      max-width: 100px;
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .stat-bar {
+      height: 100%;
+      background: var(--google-blue);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    .stat-bar.green { background: var(--google-green); }
+
+    .btn-inspect {
+      background: none;
+      border: 1px solid #dadce0;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #1a73e8;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-inspect:hover { background: #e8f0fe; }
+
+    .btn-delete-card {
+      background: none;
+      border: 1px solid #fad2cf;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #c5221f;
+      cursor: pointer;
+    }
+    .btn-delete-card:hover { background: #fce8e6; }
+
+    /* TAB SECTIONS */
+    .tab-section {
+      display: none;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .tab-section.active { display: block; }
+
+    /* GRAPH STYLES */
+    .graph-view-card {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .graph-header {
+      width: 100%;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .graph-svg-wrapper {
+      width: 100%;
+      background: #fafafa;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    svg.network-canvas {
+      width: 100%;
+      height: 520px;
+      display: block;
+    }
+
+    .link-path {
+      stroke: #bdc1c6;
+      stroke-width: 2;
+      fill: none;
+      transition: stroke 0.2s, stroke-width 0.2s;
+    }
+
+    .link-path.highlight-incoming {
+      stroke: var(--google-green);
+      stroke-width: 3.5;
+      stroke-dasharray: 6 3;
+      animation: dash 1s linear infinite;
+    }
+
+    .link-path.highlight-outgoing {
+      stroke: var(--google-blue);
+      stroke-width: 3;
+    }
+
+    @keyframes dash {
+      to { stroke-dashoffset: -18; }
+    }
+
+    .node-group {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .node-group:hover circle.node-circle {
+      stroke: #202124;
+      stroke-width: 3px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+    }
+
+    .node-circle {
+      stroke-width: 2.5px;
+      transition: all 0.2s ease;
+    }
+
+    .node-text-title {
+      font-size: 11px;
+      font-weight: 700;
+      fill: #202124;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    .node-text-sub {
+      font-size: 9px;
+      font-weight: 600;
+      fill: #5f6368;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    /* MATH EXPLAINER */
+    .math-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 16px;
+    }
+    @media (max-width: 860px) { .math-grid { grid-template-columns: 1fr; } }
+
+    .math-card {
+      background: #f8f9fa;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .math-formula {
+      background: #202124;
+      color: #8ab4f8;
+      padding: 14px 18px;
+      border-radius: 6px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 14px;
+      overflow-x: auto;
+      margin: 12px 0;
+      line-height: 1.5;
+    }
+
+    .math-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .math-table th, .math-table td {
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    .math-table th { background: #e8eaed; font-weight: 600; }
+    .math-table tr:nth-child(even) { background: #ffffff; }
+
+    /* MODAL WINDOWS */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(32,33,36,0.6);
+      backdrop-filter: blur(2px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .browser-window {
+      background: #ffffff;
+      width: 100%;
+      max-width: 820px;
+      max-height: 90vh;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+      border: 1px solid #dadce0;
+    }
+
+    .browser-chrome {
+      background: #e8eaed;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #dadce0;
+    }
+
+    .browser-dots { display: flex; gap: 6px; }
+    .b-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .b-dot.r { background: #ea4335; }
+    .b-dot.y { background: #fbbc04; }
+    .b-dot.g { background: #34a853; }
+
+    .browser-address {
+      flex: 1;
+      background: #ffffff;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-family: monospace;
+      color: #3c4043;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .close-modal-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #5f6368;
+      cursor: pointer;
+      padding: 2px 8px;
+    }
+
+    .browser-body {
+      padding: 24px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+
+    .modal-meta-box {
+      background: #f1f3f4;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+
+    /* ADD PAGE FORM */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+    .form-hint {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--google-blue);
+    }
+    .form-textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      background: #f8f9fa;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #edf0f2;
+      cursor: pointer;
+    }
+    .checkbox-label:hover {
+      background: #f1f3f4;
+    }
+    .preset-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #edf0f2;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      padding: 16px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVIGATION -->
+  <header class="top-nav">
+    <div class="brand-group">
+      <a class="logo" onclick="setQuery('pizza')" title="miniGoogle Search">
+        <span class="m">m</span><span class="i1">i</span><span class="n">n</span><span class="i2">i</span>
+        <span class="g">G</span><span class="o1">o</span><span class="o2">o</span><span class="g2">g</span><span class="l">l</span><span class="e">e</span>
+      </a>
+      <span class="tag-badge">PageRank Simulation</span>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn-primary" onclick="openAddPageModal()">
+        ➕ Add Page
+      </button>
+      <button class="btn-reset" id="resetPagesBtn" onclick="resetDefaultPages()">
+        🔄 Reset to Default 6 Pages
+      </button>
+      <button class="btn-outline active" id="tabBtnSearch" onclick="switchView('search')">
+        🔍 Search Comparison
+      </button>
+      <button class="btn-outline" id="tabBtnGraph" onclick="switchView('graph')">
+        🕸️ Link Graph (<span id="nodeCountBadge">6</span> Pages)
+      </button>
+      <button class="btn-outline" id="tabBtnMath" onclick="switchView('math')">
+        🧮 PageRank Math
+      </button>
+    </div>
+  </header>
+
+  <!-- SEARCH HERO BAR -->
+  <section class="search-hero">
+    <div class="search-container">
+      <svg class="search-icon-left" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+      <input 
+        type="text" 
+        id="searchInput" 
+        class="search-box" 
+        placeholder="Type a search keyword (e.g. pizza, pune, food, recipes, cheap)..." 
+        value="pizza"
+        autocomplete="off"
+        oninput="handleSearchInput()"
+      />
+      <button class="clear-btn" id="clearBtn" onclick="clearSearch()" title="Clear">✕</button>
+    </div>
+
+    <div class="quick-queries">
+      <span class="quick-label">Try searches:</span>
+      <button class="chip highlight" onclick="setQuery('pizza')">🍕 "pizza" (Spam Benchmark)</button>
+      <button class="chip" onclick="setQuery('pune')">📍 "pune"</button>
+      <button class="chip" onclick="setQuery('recipes')">👨‍🍳 "recipes"</button>
+      <button class="chip" onclick="setQuery('cheap')">💰 "cheap"</button>
+      <button class="chip" onclick="setQuery('food')">🍲 "food"</button>
+      <button class="chip" onclick="setQuery('canteen')">🏫 "canteen"</button>
+    </div>
+  </section>
+
+  <!-- MAIN COMPARISON VIEW -->
+  <main class="main-content">
+
+    <!-- SEARCH VIEW -->
+    <div id="viewSearch">
+      
+      <!-- INSIGHT CALLOUT BANNER -->
+      <div class="insight-banner" id="insightBanner">
+        <div class="insight-icon" id="insightIcon">💡</div>
+        <div class="insight-body">
+          <div class="insight-title" id="insightTitle">Why Old Search Engines Failed vs Why PageRank Won</div>
+          <div class="insight-desc" id="insightDesc">
+            Loading comparison...
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDE BY SIDE COMPARISON -->
+      <div class="comparison-grid">
+
+        <!-- OLD WAY COLUMN -->
+        <section class="engine-column">
+          <div class="col-header old-way">
+            <div class="col-title-area">
+              <div class="col-title">
+                <span>📜 Old Search Engines (Pre-1998)</span>
+              </div>
+              <div class="col-subtitle">AltaVista / Lycos / WebCrawler: Ranked solely by Term Frequency (TF)</div>
+            </div>
+            <span class="pill-badge red">Spam Vulnerable</span>
+          </div>
+
+          <div class="results-list" id="oldWayResults">
+            <!-- Dynamic items -->
+          </div>
+        </section>
+
+        <!-- NEW WAY COLUMN -->
+        <section class="engine-column">
+          <div class="col-header new-way">
+            <div class="col-title-area">
+              <div class="col-title">
+                <span>🚀 miniGoogle PageRank (1998+)</span>
+              </div>
+              <div class="col-subtitle">Stanford Algorithm: Backlink Authority + Endorsement Graph</div>
+            </div>
+            <span class="pill-badge green">Spam Immune</span>
+          </div>
+
+          <div class="results-list" id="newWayResults">
+            <!-- Dynamic items -->
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- GRAPH VIEW -->
+    <div id="viewGraph" class="tab-section">
+      <div class="graph-view-card">
+        <div class="graph-header">
+          <div>
+            <h2 style="font-size: 20px; font-weight: 700;">🌐 Web Hyperlink Graph & PageRank Distribution</h2>
+            <p style="font-size: 13px; color: var(--text-sub); margin-top: 4px;">
+              Nodes represent indexed websites. Node size corresponds to calculated PageRank. Click any node to highlight incoming backlinks (votes) and outgoing links.
+            </p>
+          </div>
+          <div style="display:flex; gap: 10px; align-items:center;">
+            <span style="font-size: 12px; color: var(--text-sub);">
+              <span style="color:var(--google-green); font-weight:bold;">●</span> Incoming Links (Votes)
+              &nbsp;&nbsp;
+              <span style="color:var(--google-blue); font-weight:bold;">●</span> Outgoing Links
+            </span>
+          </div>
+        </div>
+
+        <div class="graph-svg-wrapper">
+          <svg class="network-canvas" id="graphSvg" viewBox="0 0 900 520">
+            <!-- Markers for Arrowheads -->
+            <defs>
+              <marker id="arrowDefault" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#bdc1c6"/>
+              </marker>
+              <marker id="arrowIncoming" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#34a853"/>
+              </marker>
+              <marker id="arrowOutgoing" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#1a73e8"/>
+              </marker>
+            </defs>
+
+            <!-- Links -->
+            <g id="svgLinks"></g>
+            <!-- Nodes -->
+            <g id="svgNodes"></g>
+          </svg>
+        </div>
+
+        <div style="margin-top: 14px; width:100%; display: flex; justify-content: space-between; font-size: 13px; color: var(--text-sub); flex-wrap: wrap; gap: 8px;">
+          <span>💡 <strong>Tip:</strong> Click "+ Add Page" above to add new nodes to this network graph in real time!</span>
+          <span>🟢 Green links = votes received • 🔵 Blue links = outbound links</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATH VIEW -->
+    <div id="viewMath" class="tab-section">
+      <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 6px;">🧮 PageRank Mathematics & Power Iteration</h2>
+      <p style="font-size: 14px; color: var(--text-sub); line-height: 1.5;">
+        Larry Page and Sergey Brin modeled web browsing as a <strong>random surfer</strong>. A link from page A to page B is a <strong>vote of confidence</strong>.
+        The score of page B is the sum of fractional votes from all pages linking to it.
+      </p>
+
+      <div class="math-grid">
+        <div class="math-card">
+          <h3 style="font-size: 15px; font-weight: 700;">1. The PageRank Equation</h3>
+          <div class="math-formula">
+PR(u) = (1 - d)/N  +  d × ∑ [ PR(v) / L(v) ]
+          </div>
+          <p style="font-size: 13px; color: var(--text-sub); line-height: 1.5;">
+            Where:<br>
+            • <code>u</code> is the target page.<br>
+            • <code>N</code> is the current total number of pages (<span id="mathNCount">6</span>).<br>
+            • <code>d = 0.85</code> is the damping factor (85% link follower, 15% random teleport).<br>
+            • <code>v ∈ B(u)</code> are pages linking directly into <code>u</code>.<br>
+            • <code>L(v)</code> is the count of outbound links on page <code>v</code>.
+          </p>
+        </div>
+
+        <div class="math-card">
+          <h3 style="font-size: 15px; font-weight: 700;">2. Damping Factor Controller</h3>
+          <p style="font-size: 13px; color: var(--text-sub); line-height: 1.5; margin-bottom: 12px;">
+            The term <code>(1 - d) / N</code> is the minimum baseline authority granted to every page, even orphan spam with zero incoming backlinks.
+          </p>
+          <div style="display:flex; align-items:center; gap: 12px; background:#fff; padding:10px 14px; border-radius:6px; border:1px solid #dadce0;">
+            <label style="font-size:12px; font-weight:600;">Damping Factor (d):</label>
+            <input type="range" id="dampingSlider" min="0.5" max="0.95" step="0.05" value="0.85" oninput="updateDamping(this.value)" style="flex:1;">
+            <span id="dampingVal" style="font-weight:700; font-family:monospace; font-size:13px;">0.85</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size: 16px; font-weight: 700; margin-top: 24px;">📊 Live Convergence Matrix for All Pages</h3>
+      <table class="math-table">
+        <thead>
+          <tr>
+            <th>Page ID & Domain</th>
+            <th>Outbound Links L(v)</th>
+            <th>Inbound Links From</th>
+            <th>PageRank Score (PR)</th>
+            <th>Percentage Share</th>
+            <th>Authority Category</th>
+          </tr>
+        </thead>
+        <tbody id="mathTableBody">
+          <!-- Injected via JS -->
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- ADD PAGE MODAL DIALOG -->
+  <div class="modal-overlay" id="addPageModal" onclick="closeAddPageModal(event)">
+    <div class="browser-window" onclick="event.stopPropagation()" style="max-width: 680px;">
+      <div class="browser-chrome">
+        <div class="browser-dots">
+          <div class="b-dot r" onclick="closeAddPageModalDirect()"></div>
+          <div class="b-dot y"></div>
+          <div class="b-dot g"></div>
+        </div>
+        <div class="browser-address">
+          <span>➕ Add a New Website to the Web Graph</span>
+        </div>
+        <button class="close-modal-btn" onclick="closeAddPageModalDirect()" title="Close">✕</button>
+      </div>
+
+      <div class="browser-body">
+        <div class="preset-buttons">
+          <span style="font-size: 13px; font-weight: 600; color: var(--text-sub); display: flex; align-items:center;">Quick Presets:</span>
+          <button class="chip" onclick="applyPreset('spam')">🚨 Keyword Spam Site</button>
+          <button class="chip" onclick="applyPreset('authority')">🏆 High-Authority Food Blog</button>
+          <button class="chip" onclick="applyPreset('student')">🎓 Student Tech Hub</button>
+          <button class="chip" onclick="applyPreset('blank')">✨ Clear Form</button>
+        </div>
+
+        <form id="addPageForm" onsubmit="submitNewPage(event)">
+          <div class="form-group">
+            <label class="form-label" for="newPageDomain">Domain Name:</label>
+            <input type="text" id="newPageDomain" class="form-input" placeholder="e.g. pune-foodie-express.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newPageTitle">Website Title:</label>
+            <input type="text" id="newPageTitle" class="form-input" placeholder="e.g. Pune Foodie Express - Best Pizza & Street Food" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newPageSnippet">Search Snippet (Meta Description):</label>
+            <input type="text" id="newPageSnippet" class="form-input" placeholder="Short description displayed on search results card" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newPageContent">Body Content (Keywords to match):</label>
+            <textarea id="newPageContent" class="form-textarea" placeholder="Type text content here. Include words like 'pizza', 'pune', 'food' to test rankings..."></textarea>
+            <div class="form-hint">Tip: Repeating keywords here boosts Old Way rankings, but without backlinks PageRank keeps it grounded.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Outbound Hyperlinks (Which sites does this new page link to?):</label>
+            <div class="checkbox-grid" id="outboundCheckboxes">
+              <!-- Dynamically populated -->
+            </div>
+            <div class="form-hint">Your new page will distribute its PageRank votes to these selected sites.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Inbound Backlinks (Which existing sites should link to this new page?):</label>
+            <div class="checkbox-grid" id="inboundCheckboxes">
+              <!-- Dynamically populated -->
+            </div>
+            <div class="form-hint">Backlinks are votes! Getting links from high-authority pages will boost this new page's PageRank.</div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn-outline" onclick="closeAddPageModalDirect()">Cancel</button>
+            <button type="submit" class="btn-primary">Add Page to miniGoogle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIMULATED BROWSER MODAL (PAGE INSPECTOR) -->
+  <div class="modal-overlay" id="inspectModal" onclick="closeModal(event)">
+    <div class="browser-window" onclick="event.stopPropagation()">
+      <div class="browser-chrome">
+        <div class="browser-dots">
+          <div class="b-dot r" onclick="closeModalDirect()"></div>
+          <div class="b-dot y"></div>
+          <div class="b-dot g"></div>
+        </div>
+        <div class="browser-address">
+          <span>🔒 https://<span id="modalDomain">example.com</span></span>
+        </div>
+        <button class="close-modal-btn" onclick="closeModalDirect()" title="Close">✕</button>
+      </div>
+
+      <div class="browser-body">
+        <div class="modal-meta-box">
+          <div><strong>Page:</strong> <span id="modalPageNum">Page 1</span></div>
+          <div><strong>Calculated PageRank:</strong> <span id="modalPrScore">0.00%</span></div>
+          <div><strong>Inbound Links:</strong> <span id="modalInLinks">0</span></div>
+          <div><strong>Outbound Links:</strong> <span id="modalOutLinks">0</span></div>
+        </div>
+
+        <h1 id="modalTitle" style="font-size: 22px; margin-bottom: 14px; color: #1a0dab;">Page Title</h1>
+        <div id="modalContent" style="font-size: 15px; color: #3c4043; line-height: 1.8;">
+          Content here...
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #dadce0;">
+          <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">Outbound Hyperlinks on this page:</h4>
+          <ul id="modalOutLinksList" style="padding-left: 20px; font-size: 13px; color: var(--google-blue);">
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    miniGoogle • PageRank vs Keyword Frequency Demonstration • Larry Page & Sergey Brin 1998 Algorithm Model
+  </footer>
+
+  <script>
+    /* =========================================================
+       1. DATA STRUCTURE: DEFAULT 6 WEBSITES
+       ========================================================= */
+    const DEFAULT_PAGES = [
+      {
+        id: 1,
+        domain: "pune-food-guide.com",
+        title: "Pune Food Guide - Iconic Dining, Bakeries & Local Eateries",
+        snippet: "Your complete directory to discovering authentic street food, iconic Irani bakeries, and fine dining across Pune. Recommending the top culinary spots in Maharashtra's cultural capital.",
+        content: `Welcome to Pune Food Guide, your definitive source for discovering authentic street food, iconic bakeries, and fine dining across Pune. From FC Road snack joints to Kalyani Nagar cafes, we explore the best culinary wonders in Maharashtra's cultural capital. If you are looking for authentic Italian wood-fired pizza, you must check out our partner review site <a href="javascript:void(0)" onclick="openPageModal(2)">best-pizza-pune.com</a> for top rated pizzerias. Pune has an incredible variety of vegetarian thalis, misal pav, and artisan desserts.`,
+        outLinks: [2]
+      },
+      {
+        id: 2,
+        domain: "best-pizza-pune.com",
+        title: "Best Pizza in Pune - The Ultimate Wood-Fired & Neapolitan Guide",
+        snippet: "Handcrafted reviews of the best pizza joints in Pune. Crispy wood-fired sourdough crusts, artisanal San Marzano sauce, and gourmet toppings in Koregaon Park and Baner.",
+        content: `Hunting for the best pizza in Pune? Our culinary editors have eaten at every pizzeria in town to rank the finest wood-fired, thin-crust Neapolitan pizza slices in Koregaon Park, Baner, and Viman Nagar. Whether you crave sourdough crust, imported San Marzano tomato sauce, or creamy buffalo mozzarella, Pune's pizza scene is thriving. For more general city dining, visit our friends at <a href="javascript:void(0)" onclick="openPageModal(1)">pune-food-guide.com</a>, and for budget student slices, read <a href="javascript:void(0)" onclick="openPageModal(3)">college-canteen-blog.com</a>.`,
+        outLinks: [1, 3]
+      },
+      {
+        id: 3,
+        domain: "college-canteen-blog.com",
+        title: "College Canteen Blog - Budget Student Food & Campus Hangouts",
+        snippet: "A student survival guide reviewing canteen food, affordable samosas, cutting chai, and late night study spots near Pune universities and colleges.",
+        content: `A student guide to surviving on campus pocket money! We review canteen food, cheap samosas, chai tapris, and midnight study snacks near Pune universities. When semester exams finish and it's time to celebrate, head over to <a href="javascript:void(0)" onclick="openPageModal(2)">best-pizza-pune.com</a> to find the best pizza party deals in town. Or if you live in a hostel with an induction stove, learn how to bake a skillet pizza at <a href="javascript:void(0)" onclick="openPageModal(4)">pizza-recipes-home.com</a>.`,
+        outLinks: [2, 4]
+      },
+      {
+        id: 4,
+        domain: "pizza-recipes-home.com",
+        title: "Homemade Pizza Recipes - Fermented Dough, Sauce & Baking Tips",
+        snippet: "Master the art of homemade pizza with our foolproof dough recipes! Learn 72-hour cold fermentation, rustic marinara sauces, and domestic oven techniques.",
+        content: `Master the art of homemade pizza with our foolproof pizza recipes! Learn 72-hour cold fermented pizza dough, homemade marinara pizza sauce, and high-temp domestic oven baking. Making pizza at home is both delicious and rewarding. If you don't feel like cooking tonight, check out the top artisan pizzerias on <a href="javascript:void(0)" onclick="openPageModal(2)">best-pizza-pune.com</a>, or find budget ingredient markets on <a href="javascript:void(0)" onclick="openPageModal(5)">cheap-eats-pune.com</a>.`,
+        outLinks: [2, 5]
+      },
+      {
+        id: 5,
+        domain: "cheap-eats-pune.com",
+        title: "Cheap Eats Pune - Delicious Budget Meals & Street Food Under ₹100",
+        snippet: "Eating great in Pune without breaking the bank. Curated pocket-friendly meals, budget thalis, student fast food, and discounted pizza slices.",
+        content: `Eating great in Pune doesn't have to cost a fortune. Cheap Eats Pune curates affordable meals, street carts, pocket-friendly thalis, and budget fast food across the city. Did you know you can also find cheap pizza deals in Pune? Check out <a href="javascript:void(0)" onclick="openPageModal(2)">best-pizza-pune.com</a> for student discounts and 1-for-1 pizza slice offers every Tuesday afternoon.`,
+        outLinks: [2]
+      },
+      {
+        id: 6,
+        domain: "pizza-pizza-pizza.com",
+        title: "PIZZA PIZZA PIZZA - Best Cheap Pizza Pizza Recipes Pizza Pune Pizza!",
+        snippet: "Pizza pizza pizza! Best pizza pizza buy pizza fast pizza pizza Pune cheap pizza pizza yummy pizza recipes pizza delivery pizza pizza pizza!",
+        content: `<div style="background:#fff3f3; padding:15px; border:2px dashed #ea4335; margin-bottom:15px; border-radius:8px;">
+          <strong style="color:#ea4335;">⚠️ Classic 1990s Keyword Stuffing Example:</strong>
+          This page repeatedly spams the word "pizza" 45 times to trick early search engines into ranking it #1, despite having zero real editorial content or backlinks!
+        </div>
+        Pizza pizza pizza! Do you love pizza? Welcome to pizza pizza pizza! We have pizza deals, pizza delivery, pizza coupons, best pizza, hot pizza, cheese pizza, pepperoni pizza, pizza slices, pizza crust, pizza pie, cheap pizza, pizza recipes, pizza restaurant, pizza Pune, pizza Margherita, deep dish pizza, pizza toppings, Italian pizza, order pizza online now! Pizza pizza pizza lovers click <a href="javascript:void(0)" onclick="openPageModal(1)">pune-food-guide.com</a> for more pizza food guide. Pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza!`,
+        outLinks: [1]
+      }
+    ];
+
+    // Working state
+    let PAGES = [];
+    let currentDamping = 0.85;
+    let pageRankScores = {};
+    let selectedNodeId = null;
+
+    function initPages() {
+      const saved = localStorage.getItem("miniGoogle_custom_pages");
+      if (saved) {
+        try {
+          PAGES = JSON.parse(saved);
+        } catch (e) {
+          PAGES = JSON.parse(JSON.stringify(DEFAULT_PAGES));
+        }
+      } else {
+        PAGES = JSON.parse(JSON.stringify(DEFAULT_PAGES));
+      }
+      rebuildInLinks();
+      updateResetButtonVisibility();
+    }
+
+    function rebuildInLinks() {
+      PAGES.forEach(p => { p.inLinks = []; });
+      PAGES.forEach(p => {
+        p.outLinks.forEach(targetId => {
+          const target = PAGES.find(t => t.id === targetId);
+          if (target && !target.inLinks.includes(p.id)) {
+            target.inLinks.push(p.id);
+          }
+        });
+      });
+    }
+
+    function savePagesToStorage() {
+      localStorage.setItem("miniGoogle_custom_pages", JSON.stringify(PAGES));
+      updateResetButtonVisibility();
+    }
+
+    function updateResetButtonVisibility() {
+      const resetBtn = document.getElementById("resetPagesBtn");
+      const isCustomized = PAGES.length !== DEFAULT_PAGES.length || JSON.stringify(PAGES) !== JSON.stringify(DEFAULT_PAGES);
+      if (resetBtn) resetBtn.style.display = isCustomized ? "inline-flex" : "none";
+      const countBadge = document.getElementById("nodeCountBadge");
+      if (countBadge) countBadge.textContent = PAGES.length;
+      const mathN = document.getElementById("mathNCount");
+      if (mathN) mathN.textContent = PAGES.length;
+    }
+
+    function resetDefaultPages() {
+      if (confirm("Reset network to original 6 default pages?")) {
+        localStorage.removeItem("miniGoogle_custom_pages");
+        PAGES = JSON.parse(JSON.stringify(DEFAULT_PAGES));
+        rebuildInLinks();
+        updateResetButtonVisibility();
+        computePageRank(currentDamping);
+        renderResults();
+        renderGraph();
+        renderMathTable();
+      }
+    }
+
+    /* =========================================================
+       2. PAGERANK COMPUTATION (POWER ITERATION)
+       ========================================================= */
+    function computePageRank(d = 0.85) {
+      const N = PAGES.length;
+      let PR = {};
+      PAGES.forEach(p => { PR[p.id] = 1.0 / N; });
+
+      for (let iter = 0; iter < 60; iter++) {
+        let newPR = {};
+        PAGES.forEach(p => {
+          newPR[p.id] = (1.0 - d) / N;
+        });
+
+        PAGES.forEach(p => {
+          const numOut = p.outLinks.length;
+          if (numOut > 0) {
+            const voteShare = PR[p.id] / numOut;
+            p.outLinks.forEach(targetId => {
+              if (newPR[targetId] !== undefined) {
+                newPR[targetId] += d * voteShare;
+              }
+            });
+          } else {
+            // Dangling node distributes uniformly
+            const share = (d * PR[p.id]) / N;
+            PAGES.forEach(target => {
+              newPR[target.id] += share;
+            });
+          }
+        });
+
+        PR = newPR;
+      }
+
+      pageRankScores = PR;
+      return PR;
+    }
+
+    /* =========================================================
+       3. SEARCH & RANKING LOGIC
+       ========================================================= */
+    function countKeywords(text, query) {
+      if (!query || typeof query !== 'string' || query.trim() === "") return 0;
+      const cleanQuery = query.trim().toLowerCase();
+      const plainText = (text || "").replace(/<[^>]*>/g, " ").toLowerCase();
+      const escaped = cleanQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b${escaped}`, "gi");
+      const matches = plainText.match(regex);
+      return matches ? matches.length : 0;
+    }
+
+    function highlightText(text, query) {
+      if (!query || typeof query !== 'string' || query.trim() === "") return text || "";
+      const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escaped})`, "gi");
+      return (text || "").replace(regex, `<mark>$1</mark>`);
+    }
+
+    function searchEngine(query) {
+      const q = (query || "").trim().toLowerCase();
+
+      const analyzedPages = PAGES.map(p => {
+        const fullText = `${p.title} ${p.snippet} ${p.content}`;
+        const count = countKeywords(fullText, q);
+        const pr = pageRankScores[p.id] || (1 / PAGES.length);
+        const tfScore = count;
+
+        // PageRank Hybrid Score (Relevance * Authority)
+        const relevanceMultiplier = count > 0 ? (1 + Math.log2(count + 1)) : 0.05;
+        const hybridScore = pr * relevanceMultiplier;
+
+        return {
+          ...p,
+          count,
+          tfScore,
+          pr,
+          hybridScore
+        };
+      });
+
+      // 1. Old Way Ranking (Pure TF)
+      const oldWaySorted = [...analyzedPages].sort((a, b) => {
+        if (b.tfScore !== a.tfScore) return b.tfScore - a.tfScore;
+        return a.id - b.id;
+      });
+
+      // 2. New Way Ranking (PageRank Combined)
+      const newWaySorted = [...analyzedPages].sort((a, b) => {
+        if (q !== "") {
+          const aHasMatch = a.count > 0;
+          const bHasMatch = b.count > 0;
+          if (aHasMatch && !bHasMatch) return -1;
+          if (!aHasMatch && bHasMatch) return 1;
+          return b.hybridScore - a.hybridScore;
+        }
+        return b.pr - a.pr;
+      });
+
+      return { oldWay: oldWaySorted, newWay: newWaySorted };
+    }
+
+    /* =========================================================
+       4. UI RENDERING
+       ========================================================= */
+    function renderResults() {
+      const inputEl = document.getElementById("searchInput");
+      const query = inputEl ? (inputEl.value || "") : "";
+      const { oldWay, newWay } = searchEngine(query);
+
+      const oldRankMap = {};
+      oldWay.forEach((item, index) => { oldRankMap[item.id] = index + 1; });
+      const newRankMap = {};
+      newWay.forEach((item, index) => { newRankMap[item.id] = index + 1; });
+
+      // Render Old Way
+      const oldContainer = document.getElementById("oldWayResults");
+      oldContainer.innerHTML = "";
+      oldWay.forEach((page, index) => {
+        const rank = index + 1;
+        const isSpam = page.count > 12 && page.inLinks.length === 0;
+        const card = document.createElement("div");
+        card.className = `result-card ${isSpam && rank === 1 ? 'spam-winner' : ''}`;
+
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="rank-pill ${rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'standard'}">
+              ${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : ''} Rank #${rank}
+            </span>
+            ${isSpam ? '<span class="pill-badge red">⚠️ Keyword Stuffed</span>' : ''}
+            ${page.id > 6 ? '<span class="pill-badge blue">Custom Page</span>' : ''}
+          </div>
+
+          <div class="result-url-line">
+            <span class="favicon">${page.domain.charAt(0).toUpperCase()}</span>
+            <span>https://${page.domain}</span>
+          </div>
+
+          <a class="result-title" onclick="openPageModal(${page.id})">
+            ${highlightText(page.title, query)}
+          </a>
+
+          <div class="result-snippet">
+            ${highlightText(page.snippet, query)}
+          </div>
+
+          <div class="card-stats">
+            <div class="stat-badge">
+              <span>Keyword Matches:</span>
+              <strong style="color: ${isSpam ? '#ea4335' : '#1a73e8'};">${page.count}</strong>
+            </div>
+            <div class="stat-badge">
+              <span>Inbound Links:</span>
+              <strong>${page.inLinks.length}</strong>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-inspect" onclick="openPageModal(${page.id})">Inspect ↗</button>
+              ${page.id > 6 ? `<button class="btn-delete-card" onclick="deletePage(${page.id})">Delete</button>` : ''}
+            </div>
+          </div>
+        `;
+        oldContainer.appendChild(card);
+      });
+
+      // Render New Way
+      const newContainer = document.getElementById("newWayResults");
+      newContainer.innerHTML = "";
+      newWay.forEach((page, index) => {
+        const rank = index + 1;
+        const oldRank = oldRankMap[page.id];
+        const delta = oldRank - rank;
+        const isTopHub = rank === 1 && page.inLinks.length >= 3;
+
+        const card = document.createElement("div");
+        card.className = `result-card ${isTopHub ? 'legit-winner' : ''}`;
+
+        let changeBadge = '';
+        if (delta > 0) {
+          changeBadge = `<span class="rank-change up">▲ +${delta} spots</span>`;
+        } else if (delta < 0) {
+          changeBadge = `<span class="rank-change down">▼ ${delta} spots</span>`;
+        } else {
+          changeBadge = `<span class="rank-change same">● Unchanged</span>`;
+        }
+
+        const prPct = (page.pr * 100).toFixed(1);
+
+        card.innerHTML = `
+          <div class="card-top">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="rank-pill ${rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'standard'}">
+                ${rank === 1 ? '👑' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : ''} Rank #${rank}
+              </span>
+              ${changeBadge}
+            </div>
+            ${page.inLinks.length >= 3 ? '<span class="pill-badge green">✓ Trusted Authority</span>' : ''}
+            ${page.count > 10 && page.inLinks.length === 0 ? '<span class="pill-badge red">Spam Filtered Out</span>' : ''}
+            ${page.id > 6 ? '<span class="pill-badge blue">Custom Page</span>' : ''}
+          </div>
+
+          <div class="result-url-line">
+            <span class="favicon">${page.domain.charAt(0).toUpperCase()}</span>
+            <span>https://${page.domain}</span>
+          </div>
+
+          <a class="result-title" onclick="openPageModal(${page.id})">
+            ${highlightText(page.title, query)}
+          </a>
+
+          <div class="result-snippet">
+            ${highlightText(page.snippet, query)}
+          </div>
+
+          <div class="card-stats">
+            <div class="stat-badge">
+              <span>PageRank:</span>
+              <strong style="color:var(--google-green);">${prPct}%</strong>
+            </div>
+            <div class="stat-bar-container" title="PageRank Share: ${prPct}%">
+              <div class="stat-bar green" style="width: ${Math.min(100, page.pr * 250)}%;"></div>
+            </div>
+            <div class="stat-badge">
+              <span>Inbound Links:</span>
+              <strong>${page.inLinks.length} votes</strong>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-inspect" onclick="openPageModal(${page.id})">Inspect ↗</button>
+              ${page.id > 6 ? `<button class="btn-delete-card" onclick="deletePage(${page.id})">Delete</button>` : ''}
+            </div>
+          </div>
+        `;
+        newContainer.appendChild(card);
+      });
+
+      updateInsightBanner(query, oldWay, newWay);
+      document.getElementById("clearBtn").style.display = query.length > 0 ? "block" : "none";
+    }
+
+    function updateInsightBanner(query, oldWay, newWay) {
+      const q = (query || "").trim().toLowerCase();
+      const icon = document.getElementById("insightIcon");
+      const title = document.getElementById("insightTitle");
+      const desc = document.getElementById("insightDesc");
+      if (!icon || !title || !desc) return;
+
+      if (q === "pizza") {
+        icon.textContent = "🍕";
+        title.innerHTML = `Search Test: "pizza" — Landmark Comparison`;
+        desc.innerHTML = `
+          In the <strong>Old Way</strong>, spam sites like <code>pizza-pizza-pizza.com</code> win rank #1 simply by repeating the word 45+ times.
+          <br>
+          In <strong>miniGoogle PageRank</strong>, authority is decided by link endorsements: <code>best-pizza-pune.com</code> is endorsed by <strong>${PAGES.find(p=>p.id===2)?.inLinks.length || 4} websites</strong>, claiming #1 while un-endorsed spam drops to the bottom!
+        `;
+      } else if (q === "pune") {
+        icon.textContent = "📍";
+        title.innerHTML = `Search Test: "pune" — Authority Over Equal Frequency`;
+        desc.innerHTML = `
+          Multiple pages mention "Pune" equally. Old engines break ties arbitrarily. 
+          <strong>PageRank</strong> ranks the most trusted and linked-to city hubs at the very top.
+        `;
+      } else {
+        icon.textContent = "🔍";
+        title.innerHTML = `Live Comparison for "${query}" across ${PAGES.length} indexed pages`;
+        desc.innerHTML = `
+          Notice how the Old Way depends entirely on word repetition in body text, while miniGoogle balances keyword relevance with backlink reputation.
+        `;
+      }
+    }
+
+    /* =========================================================
+       5. DYNAMIC NETWORK GRAPH (SVG)
+       ========================================================= */
+    function computeNodeCoords() {
+      const coords = {};
+      const N = PAGES.length;
+
+      if (N === 6) {
+        coords[1] = { x: 200, y: 150 };
+        coords[2] = { x: 450, y: 240 };
+        coords[3] = { x: 700, y: 150 };
+        coords[4] = { x: 700, y: 380 };
+        coords[5] = { x: 450, y: 440 };
+        coords[6] = { x: 120, y: 350 };
+      } else {
+        // Dynamic circular arrangement
+        const cx = 450, cy = 260, rx = 330, ry = 200;
+        PAGES.forEach((p, idx) => {
+          const angle = (2 * Math.PI * idx) / N - Math.PI / 2;
+          coords[p.id] = {
+            x: Math.round(cx + rx * Math.cos(angle)),
+            y: Math.round(cy + ry * Math.sin(angle))
+          };
+        });
+      }
+      return coords;
+    }
+
+    function getNodeRadius(pageId) {
+      const pr = pageRankScores[pageId] || (1 / PAGES.length);
+      return Math.max(22, Math.min(52, 22 + Math.pow(pr, 0.7) * 55));
+    }
+
+    function renderGraph() {
+      const svgLinks = document.getElementById("svgLinks");
+      const svgNodes = document.getElementById("svgNodes");
+      svgLinks.innerHTML = "";
+      svgNodes.innerHTML = "";
+
+      const coords = computeNodeCoords();
+
+      // Render Directed Curved Edges
+      PAGES.forEach(src => {
+        src.outLinks.forEach(targetId => {
+          const target = PAGES.find(p => p.id === targetId);
+          if (!target) return;
+
+          const start = coords[src.id];
+          const end = coords[targetId];
+          if (!start || !end) return;
+
+          const r1 = getNodeRadius(src.id);
+          const r2 = getNodeRadius(targetId);
+
+          const dx = end.x - start.x;
+          const dy = end.y - start.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist === 0) return;
+
+          const hasReciprocal = target.outLinks.includes(src.id);
+          const curveOffset = hasReciprocal ? 32 : 18;
+
+          const nx = -dy / dist;
+          const ny = dx / dist;
+
+          const mx = (start.x + end.x) / 2 + nx * curveOffset;
+          const my = (start.y + end.y) / 2 + ny * curveOffset;
+
+          const vsX = mx - start.x;
+          const vsY = my - start.y;
+          const lenStart = Math.sqrt(vsX * vsX + vsY * vsY);
+          const startX = start.x + (vsX / lenStart) * (r1 + 2);
+          const startY = start.y + (vsY / lenStart) * (r1 + 2);
+
+          const veX = end.x - mx;
+          const veY = end.y - my;
+          const lenEnd = Math.sqrt(veX * veX + veY * veY);
+          const endX = end.x - (veX / lenEnd) * (r2 + 7);
+          const endY = end.y - (veY / lenEnd) * (r2 + 7);
+
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("d", `M ${startX.toFixed(1)} ${startY.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${endX.toFixed(1)} ${endY.toFixed(1)}`);
+          path.setAttribute("class", "link-path");
+          path.setAttribute("id", `link-${src.id}-${targetId}`);
+          path.setAttribute("marker-end", "url(#arrowDefault)");
+          svgLinks.appendChild(path);
+        });
+      });
+
+      // Render Nodes
+      PAGES.forEach(p => {
+        const coord = coords[p.id];
+        if (!coord) return;
+        const pr = pageRankScores[p.id] || (1 / PAGES.length);
+        const radius = getNodeRadius(p.id);
+
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("class", "node-group");
+        g.setAttribute("id", `node-${p.id}`);
+        g.setAttribute("onclick", `selectGraphNode(${p.id})`);
+
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", coord.x);
+        circle.setAttribute("cy", coord.y);
+        circle.setAttribute("r", radius);
+        circle.setAttribute("class", "node-circle");
+
+        if (p.id === 2) {
+          circle.setAttribute("fill", "#e6f4ea");
+          circle.setAttribute("stroke", "#34a853");
+        } else if (p.id === 6) {
+          circle.setAttribute("fill", "#fce8e6");
+          circle.setAttribute("stroke", "#ea4335");
+        } else if (p.id > 6) {
+          circle.setAttribute("fill", "#fef7e0");
+          circle.setAttribute("stroke", "#fbbc04");
+        } else {
+          circle.setAttribute("fill", "#e8f0fe");
+          circle.setAttribute("stroke", "#1a73e8");
+        }
+
+        const text1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text1.setAttribute("x", coord.x);
+        text1.setAttribute("y", coord.y - 3);
+        text1.setAttribute("class", "node-text-title");
+        text1.textContent = `P${p.id} (${(pr * 100).toFixed(1)}%)`;
+
+        const text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text2.setAttribute("x", coord.x);
+        text2.setAttribute("y", coord.y + 13);
+        text2.setAttribute("class", "node-text-sub");
+        text2.textContent = p.domain.split('.')[0].slice(0, 14);
+
+        g.appendChild(circle);
+        g.appendChild(text1);
+        g.appendChild(text2);
+        svgNodes.appendChild(g);
+      });
+    }
+
+    function selectGraphNode(nodeId) {
+      selectedNodeId = nodeId;
+      const targetPage = PAGES.find(p => p.id === nodeId);
+      if (!targetPage) return;
+
+      document.querySelectorAll(".link-path").forEach(path => {
+        path.setAttribute("class", "link-path");
+        path.setAttribute("marker-end", "url(#arrowDefault)");
+      });
+
+      targetPage.outLinks.forEach(outId => {
+        const link = document.getElementById(`link-${nodeId}-${outId}`);
+        if (link) {
+          link.setAttribute("class", "link-path highlight-outgoing");
+          link.setAttribute("marker-end", "url(#arrowOutgoing)");
+        }
+      });
+
+      targetPage.inLinks.forEach(inId => {
+        const link = document.getElementById(`link-${inId}-${nodeId}`);
+        if (link) {
+          link.setAttribute("class", "link-path highlight-incoming");
+          link.setAttribute("marker-end", "url(#arrowIncoming)");
+        }
+      });
+    }
+
+    /* =========================================================
+       6. ADD PAGE FEATURE & PRESETS
+       ========================================================= */
+    function openAddPageModal() {
+      populateLinkCheckboxes();
+      document.getElementById("addPageModal").classList.add("open");
+    }
+
+    function closeAddPageModal(event) {
+      if (event.target === document.getElementById("addPageModal")) {
+        closeAddPageModalDirect();
+      }
+    }
+
+    function closeAddPageModalDirect() {
+      document.getElementById("addPageModal").classList.remove("open");
+    }
+
+    function populateLinkCheckboxes() {
+      const outContainer = document.getElementById("outboundCheckboxes");
+      const inContainer = document.getElementById("inboundCheckboxes");
+      outContainer.innerHTML = "";
+      inContainer.innerHTML = "";
+
+      PAGES.forEach(p => {
+        // Outbound option
+        const labelOut = document.createElement("label");
+        labelOut.className = "checkbox-label";
+        labelOut.innerHTML = `
+          <input type="checkbox" name="outboundLink" value="${p.id}">
+          <span><strong>P${p.id}:</strong> ${p.domain}</span>
+        `;
+        outContainer.appendChild(labelOut);
+
+        // Inbound option
+        const labelIn = document.createElement("label");
+        labelIn.className = "checkbox-label";
+        labelIn.innerHTML = `
+          <input type="checkbox" name="inboundLink" value="${p.id}">
+          <span><strong>P${p.id}:</strong> ${p.domain}</span>
+        `;
+        inContainer.appendChild(labelIn);
+      });
+    }
+
+    function applyPreset(type) {
+      const domainInput = document.getElementById("newPageDomain");
+      const titleInput = document.getElementById("newPageTitle");
+      const snippetInput = document.getElementById("newPageSnippet");
+      const contentInput = document.getElementById("newPageContent");
+
+      // Clear checkboxes
+      document.querySelectorAll("input[name='outboundLink']").forEach(cb => cb.checked = false);
+      document.querySelectorAll("input[name='inboundLink']").forEach(cb => cb.checked = false);
+
+      if (type === 'spam') {
+        domainInput.value = "discount-pizza-king.com";
+        titleInput.value = "FREE PIZZA DEALS - CHEAP PIZZA SLICES PUNE PIZZA";
+        snippetInput.value = "Pizza pizza discount coupons cheap pizza pizza best pizza pizza fast delivery!";
+        contentInput.value = "Pizza pizza pizza pizza pizza! Get 50% off pizza today pizza pizza cheese crust pizza toppings pizza fast pizza pizza delivery Pune pizza pizza deals! Pizza pizza pizza pizza pizza pizza pizza pizza pizza pizza!";
+        // 0 inbound backlinks (Spam orphan)
+        const p1Cb = document.querySelector("input[name='outboundLink'][value='1']");
+        if (p1Cb) p1Cb.checked = true;
+      } else if (type === 'authority') {
+        domainInput.value = "pune-culinary-chronicles.com";
+        titleInput.value = "Pune Culinary Chronicles - Comprehensive Food Guide";
+        snippetInput.value = "In-depth editorial exploring authentic heritage eateries, sourdough bakeries, and Neapolitan pizza masters in Pune.";
+        contentInput.value = "Exploring the evolution of gastronomy in Pune. From vintage Deccan bakeries to artisan wood-fired pizzerias, Pune has become Maharashtra's food epicentre. Recommending best-pizza-pune.com for wood-fired pies and pune-food-guide.com for street snack discoveries.";
+        // Checkboxes: links to 1, 2, and receives links from 1, 2
+        ["1", "2"].forEach(val => {
+          const outCb = document.querySelector(`input[name='outboundLink'][value='${val}']`);
+          const inCb = document.querySelector(`input[name='inboundLink'][value='${val}']`);
+          if (outCb) outCb.checked = true;
+          if (inCb) inCb.checked = true;
+        });
+      } else if (type === 'student') {
+        domainInput.value = "coep-tech-eats.com";
+        titleInput.value = "COEP Tech Student Bites - Late Night Hostel Snacks";
+        snippetInput.value = "Campus survival guide for engineering students in Pune: cheap canteen thalis, coffee stops, and student discount pizzas.";
+        contentInput.value = "Late night coding requires cheap fuel! Here is our student-tested guide to food stalls near engineering colleges in Pune. Check out college-canteen-blog.com and pizza deals at best-pizza-pune.com.";
+        ["2", "3"].forEach(val => {
+          const outCb = document.querySelector(`input[name='outboundLink'][value='${val}']`);
+          if (outCb) outCb.checked = true;
+        });
+        const inCb = document.querySelector("input[name='inboundLink'][value='3']");
+        if (inCb) inCb.checked = true;
+      } else {
+        domainInput.value = "";
+        titleInput.value = "";
+        snippetInput.value = "";
+        contentInput.value = "";
+      }
+    }
+
+    function submitNewPage(e) {
+      e.preventDefault();
+      const domain = document.getElementById("newPageDomain").value.trim();
+      const title = document.getElementById("newPageTitle").value.trim();
+      const snippet = document.getElementById("newPageSnippet").value.trim();
+      const content = document.getElementById("newPageContent").value.trim();
+
+      if (!domain || !title) return;
+
+      // Generate next unique ID
+      const nextId = PAGES.reduce((max, p) => Math.max(max, p.id), 0) + 1;
+
+      // Selected outbound links
+      const outLinks = [];
+      document.querySelectorAll("input[name='outboundLink']:checked").forEach(cb => {
+        outLinks.push(parseInt(cb.value));
+      });
+
+      // Selected inbound links (sites that will link to this new page)
+      const inLinkSources = [];
+      document.querySelectorAll("input[name='inboundLink']:checked").forEach(cb => {
+        inLinkSources.push(parseInt(cb.value));
+      });
+
+      const newPage = {
+        id: nextId,
+        domain,
+        title,
+        snippet,
+        content,
+        outLinks
+      };
+
+      // Add page to array
+      PAGES.push(newPage);
+
+      // Add reciprocal outLinks from selected inbound sources
+      inLinkSources.forEach(srcId => {
+        const srcPage = PAGES.find(p => p.id === srcId);
+        if (srcPage && !srcPage.outLinks.includes(nextId)) {
+          srcPage.outLinks.push(nextId);
+        }
+      });
+
+      rebuildInLinks();
+      savePagesToStorage();
+
+      // Recalculate PageRank and update UI
+      computePageRank(currentDamping);
+      renderResults();
+      renderGraph();
+      renderMathTable();
+
+      closeAddPageModalDirect();
+      document.getElementById("addPageForm").reset();
+
+      // Switch to search view and alert
+      switchView('search');
+    }
+
+    function deletePage(pageId) {
+      if (confirm(`Delete Page ${pageId}?`)) {
+        PAGES = PAGES.filter(p => p.id !== pageId);
+        // Remove references in outLinks of other pages
+        PAGES.forEach(p => {
+          p.outLinks = p.outLinks.filter(id => id !== pageId);
+        });
+
+        rebuildInLinks();
+        savePagesToStorage();
+
+        computePageRank(currentDamping);
+        renderResults();
+        renderGraph();
+        renderMathTable();
+      }
+    }
+
+    /* =========================================================
+       7. MATH & DAMPING
+       ========================================================= */
+    function renderMathTable() {
+      const tbody = document.getElementById("mathTableBody");
+      tbody.innerHTML = "";
+
+      const sorted = [...PAGES].sort((a, b) => pageRankScores[b.id] - pageRankScores[a.id]);
+
+      sorted.forEach(p => {
+        const pr = pageRankScores[p.id] || 0;
+        const outList = p.outLinks.map(id => `P${id}`).join(", ") || "None";
+        const inList = p.inLinks.map(id => `P${id}`).join(", ") || "None (0 backlinks)";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>Page ${p.id}:</strong> <code>${p.domain}</code></td>
+          <td>${p.outLinks.length} (${outList})</td>
+          <td>${inList}</td>
+          <td><strong style="color:var(--google-blue);">${pr.toFixed(4)}</strong></td>
+          <td>${(pr * 100).toFixed(2)}%</td>
+          <td>
+            ${p.inLinks.length >= 3 ? '<span class="pill-badge green">Top Authority Hub</span>' : ''}
+            ${p.inLinks.length === 0 ? '<span class="pill-badge red">Spam / Zero Backlinks</span>' : ''}
+            ${p.inLinks.length > 0 && p.inLinks.length < 3 ? '<span class="pill-badge" style="background:#e8eaed;">Standard Node</span>' : ''}
+            ${p.id > 6 ? '<span class="pill-badge blue">Custom</span>' : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateDamping(val) {
+      currentDamping = parseFloat(val);
+      document.getElementById("dampingVal").textContent = currentDamping.toFixed(2);
+      computePageRank(currentDamping);
+      renderResults();
+      renderGraph();
+      renderMathTable();
+    }
+
+    /* =========================================================
+       8. SIMULATED BROWSER MODAL (PAGE VIEWER)
+       ========================================================= */
+    function openPageModal(pageId) {
+      const page = PAGES.find(p => p.id === pageId);
+      if (!page) return;
+
+      document.getElementById("modalDomain").textContent = page.domain;
+      document.getElementById("modalPageNum").textContent = `Page ${page.id}`;
+      document.getElementById("modalTitle").textContent = page.title;
+      document.getElementById("modalPrScore").textContent = `${((pageRankScores[page.id] || 0) * 100).toFixed(2)}%`;
+      document.getElementById("modalInLinks").textContent = `${page.inLinks.length} incoming links`;
+      document.getElementById("modalOutLinks").textContent = `${page.outLinks.length} links`;
+      document.getElementById("modalContent").innerHTML = page.content;
+
+      const outListEl = document.getElementById("modalOutLinksList");
+      outListEl.innerHTML = "";
+      if (page.outLinks.length === 0) {
+        outListEl.innerHTML = "<li>No outbound links</li>";
+      } else {
+        page.outLinks.forEach(targetId => {
+          const target = PAGES.find(p => p.id === targetId);
+          if (target) {
+            const li = document.createElement("li");
+            li.innerHTML = `<a href="javascript:void(0)" onclick="openPageModal(${target.id})" style="color:#1a0dab; text-decoration:underline;">Page ${target.id}: https://${target.domain}</a>`;
+            outListEl.appendChild(li);
+          }
+        });
+      }
+
+      document.getElementById("inspectModal").classList.add("open");
+    }
+
+    function closeModal(event) {
+      if (event.target === document.getElementById("inspectModal")) {
+        closeModalDirect();
+      }
+    }
+
+    function closeModalDirect() {
+      document.getElementById("inspectModal").classList.remove("open");
+    }
+
+    /* =========================================================
+       9. CONTROLS, SEARCH INPUT & VIEWS
+       ========================================================= */
+    function handleSearchInput() {
+      renderResults();
+    }
+
+    function setQuery(word) {
+      document.getElementById("searchInput").value = word;
+      renderResults();
+      switchView('search');
+    }
+
+    function clearSearch() {
+      document.getElementById("searchInput").value = "";
+      renderResults();
+      document.getElementById("searchInput").focus();
+    }
+
+    function switchView(viewName) {
+      document.getElementById("tabBtnSearch").classList.remove("active");
+      document.getElementById("tabBtnGraph").classList.remove("active");
+      document.getElementById("tabBtnMath").classList.remove("active");
+
+      document.getElementById("viewSearch").style.display = "none";
+      document.getElementById("viewGraph").classList.remove("active");
+      document.getElementById("viewMath").classList.remove("active");
+
+      if (viewName === 'search') {
+        document.getElementById("tabBtnSearch").classList.add("active");
+        document.getElementById("viewSearch").style.display = "block";
+      } else if (viewName === 'graph') {
+        document.getElementById("tabBtnGraph").classList.add("active");
+        document.getElementById("viewGraph").classList.add("active");
+        renderGraph();
+      } else if (viewName === 'math') {
+        document.getElementById("tabBtnMath").classList.add("active");
+        document.getElementById("viewMath").classList.add("active");
+        renderMathTable();
+      }
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeModalDirect();
+        closeAddPageModalDirect();
+      }
+    });
+
+    /* =========================================================
+       10. INITIALIZATION
+       ========================================================= */
+    initPages();
+    computePageRank(0.85);
+    renderResults();
+    renderGraph();
+    renderMathTable();
+  </script>
+</body>
+</html>
